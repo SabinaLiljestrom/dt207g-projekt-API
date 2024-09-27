@@ -1,0 +1,2 @@
+JW token för test körning i thunder klient
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkFkbWluTm9yZGljQml0ZXMiLCJpYXQiOjE3Mjc0NjI3NTUsImV4cCI6MTcyNzQ2NjM1NX0.uAC0nztZbD1mwaHn5dukRnX0jfhmN6yQMvbG6cx_TR8

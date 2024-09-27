@@ -6,13 +6,16 @@
 const express = require("express");
 const bodyParser = require ("body-parser");
 const authRoutes = require ("./routes/authRoutes");
+const menuRoutes = require("./routes/menuRoutes");
 const jwt = require("jsonwebtoken");
 const cors = require('cors');
+const mongoose = require("mongoose");
 require("dotenv").config();
 
 //init express
 const app = express ();
 let port = process.env.PORT || 3000;
+
 app.use(bodyParser.json());
 app.use(cors({
   origin: '*', // Tillåt alla ursprung
@@ -20,12 +23,20 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'] // Tillåt dessa headers
 }));
 
+// Anslut till MongoDB
+mongoose.connect(process.env.DATABASE).then(() => {
+    console.log("Ansluten till MongoDB");
+}).catch((error) => {
+    console.error("Fel vid anslutning till databasen:", error.message);
+});
+
 //routes
 app.use("/api", authRoutes);
+app.use("/api", authenticateToken, menuRoutes);
 
 // skyddad routes
 app.get ("/api/protected", authenticateToken, (req, res) => {
-    res.json ({message: "Skyddad route!"});
+    res.json ({message: "Skyddad route för meny hantering!"});
 });
 
 //validera Token
@@ -42,7 +53,7 @@ function authenticateToken(req, res, next) {
             return res.status(403).json({ message: "Invalid token" }); // Felaktig token ger JSON-svar
         }
 
-        req.username = user.username; // Användaren hämtad från JWT payload
+        req.username = user.username; 
         next(); // Fortsätt till skyddad route
     });
 }
