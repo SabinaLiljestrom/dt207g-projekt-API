@@ -1,0 +1,50 @@
+/**
+ * Routes for auth
+ */
+const express = require("express");
+const router = express.Router();
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+require("dotenv").config();
+
+// Hårdkodat användarnamn och lösenord (förbestämt)
+const predefinedUser = {
+    username: "AdminNordicBites", // förvalt användarnamn
+    passwordHash: "$2b$10$DTwjpoZwHs.OYRqOn5ZCA.kncVEpEvsPQz80Ut5sfV.0DD8/DI/QW" // bcrypt-hashat lösenord, "password123"
+};
+
+// login user
+router.post("/login", async (req, res) => {
+    try {
+        const { username, password } = req.body;
+
+        if (!username || !password) {
+            return res.status(400).json({ error: "Username and password are required" });
+        }
+
+        // Kontrollera om användarnamnet stämmer
+        if (username !== predefinedUser.username) {
+            return res.status(401).json({ error: "Invalid username!" });
+        }
+
+        // Kontrollera lösenordet mot det hashade lösenordet
+        const isPasswordMatch = await bcrypt.compare(password, predefinedUser.passwordHash);
+        if (!isPasswordMatch) {
+            return res.status(401).json({ error: "Invalid password!" });
+        }
+
+        // Skapa och signera JWT-token
+        const payload = { username: predefinedUser.username };
+        const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+
+        res.status(200).json({
+            message: "User logged in!",
+            token: token
+        });
+
+    } catch (error) {
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+module.exports = router;
