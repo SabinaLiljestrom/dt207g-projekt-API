@@ -31,8 +31,12 @@ mongoose.connect(process.env.DATABASE).then(() => {
 });
 
 //routes
-app.use("/api", authRoutes);
-app.use("/api", authenticateToken, menuRoutes);
+// Rutter utan autentisering
+app.use("/api", menuRoutes); // Detta gör att meny-rutter är öppna för alla
+
+// Rutter som kräver autentisering
+app.use("/api", authRoutes); // Skyddade rutter som kräver inloggning
+
 
 // skyddad routes
 app.get ("/api/protected", authenticateToken, (req, res) => {

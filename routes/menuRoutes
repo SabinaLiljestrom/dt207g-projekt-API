@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const MenuItem = require("../models/MenuItem"); // Importera menyobjektmodellen
+const mongoose = require("mongoose");
 
 // Hämta alla menyobjekt
 router.get("/menu", async (req, res) => {
@@ -28,7 +29,20 @@ router.post("/menu", async (req, res) => {
         }
     }
 });
-
+// Hämta ett specifikt menyobjekt
+router.get("/menu/:id", async (req, res) => {
+    try {
+        const menuItemId = mongoose.Types.ObjectId(req.params.id); // Konvertera ID:t till ObjectId
+        const menuItem = await MenuItem.findById(menuItemId);
+        
+        if (!menuItem) {
+            return res.status(404).json({ message: "Ingen maträtt hittades med det ID:t" });
+        }
+        res.json(menuItem);
+    } catch (error) {
+        return res.status(500).json({ error: "Serverfel vid hämtning av rätt" });
+    }
+});
 // Uppdatera ett menyobjekt
 router.put("/menu/:id", async (req, res) => {
     try {
